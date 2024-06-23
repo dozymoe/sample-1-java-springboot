@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+    layout:decorate="~{layouts/base}">
+  <main layout:fragment="main">
+    <h1 th:text="${pageTitle}"></h1>
+    <div th:if="${message}" class="alert alert-success text-center my-3">
+      [[${message}]]
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Company</th>
+          <th>Role</th>
+          <th>Created At</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="obj : ${objects}">
+          <td th:text="${obj.getFullName()}"></td>
+          <td th:text="${obj.getCompany().getName()}"></td>
+          <td th:text="${#strings.arrayJoin(obj.getRoleNames(), '')}"></td>
+          <td th:text="${#temporals.format(obj.getCreatedAt(), 'yyyy-MM-dd HH:mm')}"></td>
+          <td>
+            <a th:href="@{'/admin/user/' + ${obj.id} + '/edit'}"
+                sec:authorize="hasPermission(#vars.obj, 'update')"
+                class="btn btn-link btn-sm">
+              Edit
+            </a>
+            <a th:href="@{'/admin/user/' + ${obj.id} + '/delete'}"
+                sec:authorize="hasPermission(#vars.obj, 'delete')"
+                class="btn btn-link btn-sm">
+              Delete
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </main>
+</html>

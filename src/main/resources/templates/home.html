@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+    layout:decorate="~{layouts/base}">
+  <main layout:fragment="main">
+    <h1 th:text="${pageTitle}"></h1>
+    <p>
+      Click here to
+      <a href="/auth/login" sec:authorize="! isAuthenticated()">
+        login
+      </a>
+      <a href="/auth/logout" sec:authorize="isAuthenticated()">
+        logout
+      </a>.
+    </p>
+    <p sec:authorize="isAuthenticated()">
+        Click here to visit
+        <a href="/dashboard">Dashboard</a>
+    </p>
+  </main>
+</html>

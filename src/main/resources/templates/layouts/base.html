@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+  <head>
+    <meta charset="UTF-8">
+    <title th:text="${pageTitle} + ' - Sample1'"></title>
+    <meta name="description" th:content="${pageDescription}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <th:block layout:fragment="head-meta"></th:block>
+    <th:block th:each="href : ${webpack_css}">
+      <link rel="stylesheet" th:href="@{${href}}">
+    </th:block>
+    <th:block th:each="href : ${webpack_js}">
+      <script th:src="@{${href}}"></script>
+    </th:block>
+    <th:block layout:fragment="head-css"/>
+    <th:block layout:fragment="head-js"/>
+  </head>
+  <body>
+    <div class="container-fluid">
+      <nav th:replace="~{fragments/navbar :: default}"></nav>
+      <section layout:fragment="content">
+        <main layout:fragment="main"></main>
+      </section>
+    </div>
+  </body>
+</html>

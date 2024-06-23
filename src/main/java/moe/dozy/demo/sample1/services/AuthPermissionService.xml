@@ -1,0 +1,55 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="moe.dozy.demo.sample1.services.AuthPermissionService">
+    <select id="findAll" resultType="AuthPermission">
+        SELECT * FROM auth_permissions
+    </select>
+
+    <select id="findById" resultType="AuthPermission">
+        SELECT * FROM auth_permissions WHERE id = #{id}
+    </select>
+
+    <select id="findByName" parameterType="map" resultType="AuthPermission">
+        SELECT * FROM auth_permission
+        WHERE
+            name = #{name}
+            <choose>
+                <when test="guard != null">
+                    AND guard_name = #{guard}
+                </when>
+                <otherwise>
+                    AND guard_name = 'web'
+                </otherwise>
+            </choose>
+    </select>
+
+    <!-- returning AuthPermission is not working in MySQL -->
+    <select id="upsert" parameterType="AuthPermission"
+            resultType="AuthPermission" flushCache="true">
+        <if test="_databaseId == 'MySQL'">
+            INSERT INTO auth_permissions
+                (name, guard_name)
+            VALUES
+                (#{name}, #{guard_name})
+            ON DUPLICATE KEY UPDATE
+                updated_at = NOW();
+
+            SELECT * FROM auth_permissions
+            WHERE id = LAST_INSERT_ID();
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            SELECT * FROM auth_permissions WHERE id =
+            (
+                INSERT INTO auth_permissions
+                    (name, guard_name)
+                VALUES
+                    (#{name}, #{guard_name})
+                ON CONFLICT ON CONSTRAINT (name, guard_name)
+                DO UPDATE SET
+                    updated_at = NOW()
+                RETURNING id
+            )
+        </if>
+    </select>
+</mapper>

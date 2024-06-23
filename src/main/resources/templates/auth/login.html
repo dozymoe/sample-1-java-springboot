@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+    layout:decorate="~{layouts/base}">
+  <main layout:fragment="main">
+    <div th:if="${param.error}">
+        Invalid username and password
+    </div>
+    <div th:if="${param.logout}">
+        You have been logged out.
+    </div>
+    <form th:action="@{/auth/login}" method="POST" class="container">
+      <div class="mb-3">
+        <label for="username">Username</label>
+        <input name="username" value="" type="email"
+            autofocus id="username" class="form-control">
+      </div>
+
+      <div class="mb-3">
+        <label for="password">Password</label>
+        <input name="password" value="" type="password"
+            id="password" class="form-control">
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Sign in
+      </button>
+    </form>
+  </main>
+</html>

@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html
+    xmlns:th="http://www.thymeleaf.org"
+    xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+    xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+    layout:decorate="~{layouts/base}">
+  <main layout:fragment="main">
+    <form action="" method="POST">
+      <p>Do you really want to delete this user:
+          [[${object.id}}].] [[${object.name}]]?</p>
+
+      <button type="submit" class="btn btn-primary">Delete</button>
+    </form>
+  </main>
+</html>
