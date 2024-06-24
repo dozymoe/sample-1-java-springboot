@@ -1,0 +1,5 @@
+mvn: start
+	docker exec $(NAME) /home/user/work/mvnw $(args)
+
+test: start
+	docker exec $(NAME) /home/user/work/mvnw test -P test $(args)

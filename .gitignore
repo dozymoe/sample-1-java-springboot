@@ -1,7 +1,10 @@
 HELP.md
 target/
+/src/main/resources/application.properties
 /src/main/resources/static/assets/
 /src/main/resources/webpack-*
+/tmp/
+/var/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

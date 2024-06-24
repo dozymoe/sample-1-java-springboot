@@ -1,0 +1,48 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="moe.dozy.demo.sample1.services.CompanyService">
+    <select id="findAll" resultType="Company">
+        SELECT * FROM companies
+        ORDER BY created_at DESC
+    </select>
+
+    <select id="findById" resultType="Company">
+        SELECT * FROM companies WHERE id = #{id}
+    </select>
+
+    <select id="findByName" resultType="Company">
+        SELECT * FROM companies WHERE name = #{name}
+    </select>
+
+    <!-- returning AuthPermission is not working in MySQL -->
+    <select id="upsert" parameterType="Company"
+            resultType="Company" flushCache="true">
+        <if test="_databaseId == 'MySQL'">
+            INSERT INTO companies
+                (name, parent_id)
+            VALUES
+                (#{name}, #{parent_id})
+            ON DUPLICATE KEY UPDATE
+                parent_id = #{parent_id},
+                updated_at = NOW();
+
+            SELECT * FROM companies
+            WHERE id = LAST_INSERT_ID();
+        </if>
+        <if test="_databaseId == 'postgresql'">
+            SELECT * FROM companies WHERE id =
+            (
+                INSERT INTO companies
+                    (name, parent_id)
+                VALUES
+                    (#{name}, #{parent_id})
+                ON CONFLICT ON CONSTRAINT (name)
+                DO UPDATE SET
+                    parent_id = #{parent_id},
+                    updated_at = NOW()
+                RETURNING id
+            )
+        </if>
+    </select>
+</mapper>

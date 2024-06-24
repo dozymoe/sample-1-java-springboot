@@ -1,0 +1,13 @@
+FROM mysql:8
+
+ENV MYSQL_ROOT_PASSWORD demo_pass
+
+# These files can become huge, gigabytes
+# See: https://github.com/sagemathinc/cocalc/issues/2287
+#RUN rm /var/log/faillog /var/log/lastlog
+
+COPY initdb.d docker-entrypoint-initdb.d
+COPY files/mysql.cnf /etc/mysql/conf.d/51-server.cnf
+
+HEALTHCHECK --timeout=5s --retries=12 \
+    CMD mysqladmin -uroot -pdemo_pass ping | grep alive
