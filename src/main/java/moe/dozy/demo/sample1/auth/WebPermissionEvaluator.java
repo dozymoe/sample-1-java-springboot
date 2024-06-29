@@ -8,10 +8,12 @@ import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
 import moe.dozy.demo.sample1.models.AuthRole;
 import moe.dozy.demo.sample1.models.User;
 import moe.dozy.demo.sample1.services.UserService;
 
+@Slf4j
 @Component
 public class WebPermissionEvaluator implements PermissionEvaluator {
 

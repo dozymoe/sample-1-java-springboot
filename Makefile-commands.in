@@ -3,3 +3,8 @@ mvn: start
 
 test: start
 	docker exec $(NAME) /home/user/work/mvnw test -P test $(args)
+
+run-mysql:
+	$(MAKE) $(MAKEARGS) mysql cmd=mysql args=$(args)
+
+.PHONY: mvn test run-mysql

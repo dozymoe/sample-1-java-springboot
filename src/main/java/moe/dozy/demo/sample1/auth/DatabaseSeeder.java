@@ -76,7 +76,7 @@ public class DatabaseSeeder implements CommandLineRunner {
             }});
             User userAdmin = userService.findByEmail(emailAdmin);
             beanFactory.autowireBean(userAdmin);
-            userAdmin.setRoles(new AuthRole[] { roleAdmin });
+            userAdmin.setRoles(roleAdmin);
 
             if (company.getParentId() != null) {
                 // This is sub-company
@@ -91,7 +91,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     }});
                     User userSupervisor = userService.findByEmail(emailSupervisor);
                     beanFactory.autowireBean(userSupervisor);
-                    userSupervisor.setRoles(new AuthRole[] { roleSupervisor });
+                    userSupervisor.setRoles(roleSupervisor);
                 }
                 for (int ii : IntStream.rangeClosed(1, 50).toArray()) {
                     String emailUser = "user" + Integer.toString(ii) + emailHost;
@@ -104,7 +104,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     }});
                     User userUser = userService.findByEmail(emailUser);
                     beanFactory.autowireBean(userUser);
-                    userUser.setRoles(new AuthRole[] { roleUser });
+                    userUser.setRoles(roleUser);
                 }
             } else {
                 // This is parent company
@@ -119,7 +119,7 @@ public class DatabaseSeeder implements CommandLineRunner {
                     }});
                     User userManager = userService.findByEmail(emailManager);
                     beanFactory.autowireBean(userManager);
-                    userManager.setRoles(new AuthRole[] { roleManager });
+                    userManager.setRoles(roleManager);
                 }
             }
         }

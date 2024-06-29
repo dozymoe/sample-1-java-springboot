@@ -5,11 +5,15 @@
     xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
     layout:decorate="~{layouts/base}">
   <main layout:fragment="main">
-    <form action="" method="POST">
+    <form action="" method="POST" class="delete-user">
       <p>Do you really want to delete this user:
-          [[${object.id}}].] [[${object.name}]]?</p>
+          [[${object.id}]]. [[${object.name}]]?</p>
 
       <button type="submit" class="btn btn-primary">Delete</button>
+      <a th:if="${forwardUrl}" th:href="${forwardUrl}"
+          class="btn btn-link go-back">
+        Back
+      </a>
     </form>
   </main>
 </html>

@@ -1,6 +1,7 @@
 HELP.md
 target/
 /src/main/resources/application.properties
+/src/main/resources/application-test.properties
 /src/main/resources/static/assets/
 /src/main/resources/webpack-*
 /tmp/

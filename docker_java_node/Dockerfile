@@ -10,7 +10,7 @@ RUN rm /var/log/faillog /var/log/lastlog
 RUN apt-get update && apt-get install -y nodejs npm yarnpkg
 RUN apt-get update && apt-get install -y vim-tiny
 
-RUN apt-get autoclean -y && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/pear/
+RUN apt-get autoclean -y && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -g $gid mygroup
 RUN useradd -G root -u $uid -g $gid -d /home/user -m -s /bin/bash myuser

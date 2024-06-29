@@ -7,6 +7,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import moe.dozy.demo.sample1.filters.UserFilterBy;
 import moe.dozy.demo.sample1.models.User;
 import moe.dozy.demo.sample1.services.providers.UserSqlProvider;
 
@@ -16,6 +17,7 @@ public interface UserService {
     public User findById(Long id);
     public User findByName(String name);
     public User findByEmail(String email);
+    public void update(User user);
     public User upsert(User user);
 
     @DeleteProvider(type=UserSqlProvider.class, method="delete")
@@ -23,4 +25,7 @@ public interface UserService {
 
     @SelectProvider(type=UserSqlProvider.class, method="findAllWithAuth")
     public List<User> findAllWithAuth(UserDetails user);
+
+    @SelectProvider(type=UserSqlProvider.class, method="findAllBy")
+    public List<User> findAllBy(UserFilterBy filter);
 }

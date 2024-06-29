@@ -1,4 +1,4 @@
-PID := sample1
+PID := sample1-springboot
 
 NAME = $(PID).demo
 NETWORK = internal.demo
@@ -29,7 +29,7 @@ start: build mysql
 
 build: tmp/.$(PID)-build
 
-tmp/.$(PID)-build:
+tmp/.$(PID)-build: tmp/.network
 	$(MAKE) $(MAKEARGS) -C docker_java_node build
 	-docker stop -t60 $(NAME)
 	-docker rm $(NAME)

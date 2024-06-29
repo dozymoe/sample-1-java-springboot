@@ -26,12 +26,12 @@
           <td th:text="${#strings.arrayJoin(obj.getRoleNames(), '')}"></td>
           <td th:text="${#temporals.format(obj.getCreatedAt(), 'yyyy-MM-dd HH:mm')}"></td>
           <td>
-            <a th:href="@{'/admin/user/' + ${obj.id} + '/edit'}"
+            <a th:href="@{'/admin/user/' + ${obj.id} + '/edit?next=' + ${#uris.escapeQueryParam(requestUrl)}}"
                 sec:authorize="hasPermission(#vars.obj, 'update')"
                 class="btn btn-link btn-sm">
               Edit
             </a>
-            <a th:href="@{'/admin/user/' + ${obj.id} + '/delete'}"
+            <a th:href="@{'/admin/user/' + ${obj.id} + '/delete?next=' + ${#uris.escapeQueryParam(requestUrl)}}"
                 sec:authorize="hasPermission(#vars.obj, 'delete')"
                 class="btn btn-link btn-sm">
               Delete

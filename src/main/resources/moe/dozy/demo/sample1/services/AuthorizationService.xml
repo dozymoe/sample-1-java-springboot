@@ -15,20 +15,23 @@
     </select>
 
     <insert id="setUserRoles" parameterType="map">
+        DELETE FROM auth_user_has_roles
         <choose>
             <when test="guard != null">
-                DELETE FROM auth_user_has_roles
                 INNER JOIN auth_roles AS r
                 ON r.id = role_id
                 WHERE
                     user_id = #{user.id}
-                    AND r.guard_name = #{guard};
+                    AND r.guard_name = #{guard}
             </when>
             <otherwise>
-                DELETE FROM auth_user_has_roles
-                WHERE user_id = #{user.id};
+                WHERE user_id = #{user.id}
             </otherwise>
         </choose>
+            AND role_id NOT IN (
+            <foreach item="role" collection="roles" separator=",">
+            #{role.id}
+            </foreach> );
 
         INSERT
         <if test="_databaseId == 'MySQL'">

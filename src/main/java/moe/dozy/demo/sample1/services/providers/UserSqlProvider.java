@@ -5,8 +5,11 @@ import java.util.Arrays;
 import org.apache.ibatis.jdbc.SQL;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.extern.slf4j.Slf4j;
+import moe.dozy.demo.sample1.filters.UserFilterBy;
 import moe.dozy.demo.sample1.models.User;
 
+@Slf4j
 public class UserSqlProvider {
 
     public String findAllWithAuth(UserDetails user) {
@@ -45,6 +48,39 @@ public class UserSqlProvider {
 
             ORDER_BY("created_at DESC");
         }}.toString();
+    }
+
+    public String findAllBy(UserFilterBy filter) {
+        var sql = new SQL() {{
+            SELECT("u.*");
+            FROM("users AS u");
+
+            if (filter.getCompany() != null) {
+                if (filter.getIncludeSubCompany()) {
+                    INNER_JOIN("companies as c ON u.company_id = c.id");
+                    WHERE("(u.company_id = #{company.id} OR c.parent_id = #{company.id})");
+                } else {
+                    WHERE("u.company_id = #{company.id}");
+                }
+            }
+
+            if (!filter.getAnyRoles().isEmpty()) {
+                INNER_JOIN("auth_user_has_roles AS uhr ON uhr.user_id = u.id");
+                INNER_JOIN("auth_roles AS r ON uhr.role_id = r.id");
+
+                var where = new StringBuilder();
+                where.append("1 = 0");
+                for (var role : filter.getAnyRoles()) {
+                    where.append(" OR r.name = '" + role + "'");
+                }
+                WHERE("(" + where.toString() + ")");
+            }
+
+            ORDER_BY("created_at DESC");
+        }}.toString();
+
+        log.info(sql);
+        return sql;
     }
 
     public String delete(User user) {

@@ -4,15 +4,8 @@
     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
     xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
     layout:decorate="~{layouts/base}">
-  <head>
-    <th:block layout:fragment="head-meta">
-      <meta name="_csrf" th:content="${_csrf.token}"/>
-      <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-    </th:block>
-  </head>
   <main layout:fragment="main">
-    <form action="" method="POST" th:object="${object}">
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <form action="" method="POST" th:object="${object}" class="edit-user">
       <div class="mb-3">
         <label for="name">Name</label>
         <input name="name" th:field="*{name}" type="text" id="name"
@@ -46,6 +39,10 @@
 
       <button type="submit" class="btn btn-primary">Update</button>
       <button type="reset" class="btn btn-secondary">Reset</button>
+      <a th:if="${forwardUrl}" th:href="${forwardUrl}"
+          class="btn btn-link go-back">
+        Back
+      </a>
     </form>
   </main>
 </html>

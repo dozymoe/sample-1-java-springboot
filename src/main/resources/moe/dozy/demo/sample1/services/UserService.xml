@@ -19,7 +19,16 @@
         SELECT * FROM users WHERE email = #{email}
     </select>
 
-    <!-- returning AuthPermission is not working in MySQL -->
+    <update id="update" parameterType="User">
+        UPDATE users
+        SET
+            name = #{name},
+            email = #{email}
+        WHERE
+            id = #{id}
+    </update>
+
+    <!-- returning User is not working in MySQL -->
     <select id="upsert" parameterType="User" resultType="User"
             flushCache="true">
         <if test="_databaseId == 'MySQL'">

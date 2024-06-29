@@ -48,9 +48,12 @@ public class UserRequest implements Serializable {
                 role.getId());
     }
 
-    public void merge(User to) {
-        to.setName(name);
-        to.setEmail(email);
-        to.setRoles(authRoleService.findById(role_id));
+    public void mergeTo(User target) {
+        target.setName(name);
+        target.setEmail(email);
+    }
+
+    public void mergeRelationsTo(User target) {
+        target.setRoles(authRoleService.findById(role_id));
     }
 }

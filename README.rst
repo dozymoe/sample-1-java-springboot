@@ -33,8 +33,8 @@ Cara Pakai
 
 A. Panduan untuk menyiapkan sistemnya:
 
-1. buat file application.properties dengan menyalid dari file
-   src/main/resources/application.properties.example
+1. buat file application.properties dan application-test.properties dengan menyalin
+   dari file src/main/resources/application.properties.example
 2. make start
 3. make test
 
