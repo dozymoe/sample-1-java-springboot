@@ -25,7 +25,7 @@ import moe.dozy.demo.sample1.Sample1Properties;
 import moe.dozy.demo.sample1.auth.WebUserDetails;
 import moe.dozy.demo.sample1.filters.UserFilterBy;
 import moe.dozy.demo.sample1.models.User;
-import moe.dozy.demo.sample1.services.UserService;
+import moe.dozy.demo.sample1.repositories.UserRepository;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -39,7 +39,7 @@ public class DashboardIntegrationTest {
     @Autowired
     private Sample1Properties properties;
     @Autowired
-    private UserService userService;
+    private UserRepository userService;
 
     @Test
     public void shouldDenyAnonymous() throws Exception {

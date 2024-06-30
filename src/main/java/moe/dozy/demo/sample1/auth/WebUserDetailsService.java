@@ -1,7 +1,7 @@
 package moe.dozy.demo.sample1.auth;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,15 +14,13 @@ import moe.dozy.demo.sample1.services.UserService;
 public class WebUserDetailsService implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
-    @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    private ApplicationContext appContext;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        var userService = new UserService(appContext);
         User userObj = userService.findByName(username);
         if (userObj != null) {
-            beanFactory.autowireBean(userObj);
             return new WebUserDetails(userObj);
         } else {
             throw new UsernameNotFoundException(username);

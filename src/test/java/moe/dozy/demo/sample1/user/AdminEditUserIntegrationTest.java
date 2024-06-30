@@ -2,16 +2,15 @@ package moe.dozy.demo.sample1.user;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -37,15 +36,9 @@ public class AdminEditUserIntegrationTest {
     private String user1Url;
 
     @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    private ApplicationContext appContext;
     @Autowired
     private MockMvc client;
-    @Autowired
-    private CompanyService companyService;
-    @Autowired
-    private AuthRoleService roleService;
-    @Autowired
-    private UserService userService;
 
     @Test
     public void shouldDenyAnonymous() throws Exception {
@@ -58,8 +51,10 @@ public class AdminEditUserIntegrationTest {
 
     @Test
     public void whenAdminVisitEditUser() throws Exception {
+        var userService = new UserService(appContext);
+        var roleService = new AuthRoleService(appContext);
+
         User user = userService.findByName("admin@ptxyz1.com");
-        beanFactory.autowireBean(user);
 
         var dom = Jsoup.parse(client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -91,7 +86,6 @@ public class AdminEditUserIntegrationTest {
                     .redirectedUrl("/dashboard"));
 
         var stored = userService.findByEmail(user1Email);
-        beanFactory.autowireBean(stored);
         assertNotNull(stored);
         assertEquals(stored.getName(), BASENAME);
         assertTrue(stored.getRoleNames().contains("supervisor"));
@@ -99,8 +93,9 @@ public class AdminEditUserIntegrationTest {
 
     @Test
     public void whenOtherAdminVisitEditUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("admin@ptxyz2.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -118,8 +113,9 @@ public class AdminEditUserIntegrationTest {
 
     @Test
     public void whenManagerVisitEditUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("manager1@ptxyz.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -137,8 +133,9 @@ public class AdminEditUserIntegrationTest {
 
     @Test
     public void whenSupervisorVisitEditUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("supervisor1@ptxyz1.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -156,8 +153,9 @@ public class AdminEditUserIntegrationTest {
 
     @Test
     public void whenUserVisitEditUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("user1@ptxyz1.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -175,6 +173,10 @@ public class AdminEditUserIntegrationTest {
 
     @BeforeEach
     private void setup() {
+        var companyService = new CompanyService(appContext);
+        var userService = new UserService(appContext);
+        var roleService = new AuthRoleService(appContext);
+
         String user1Name = BASENAME + "User1";
         Company company = companyService.findByName("PT. XYZ-1");
 
@@ -187,7 +189,6 @@ public class AdminEditUserIntegrationTest {
             setPassword("pass");
         }});
         var user1 = userService.findByEmail(this.user1Email);
-        beanFactory.autowireBean(user1);
 
         AuthRole roleUser = roleService.findByName("user", null);
         user1.setRoles(roleUser);

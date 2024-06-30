@@ -7,9 +7,9 @@ import org.jsoup.Jsoup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,15 +35,9 @@ public class AdminDeleteUserIntegrationTest {
     private String user1Url;
 
     @Autowired
-    private AutowireCapableBeanFactory beanFactory;
+    private ApplicationContext appContext;
     @Autowired
     private MockMvc client;
-    @Autowired
-    private CompanyService companyService;
-    @Autowired
-    private AuthRoleService roleService;
-    @Autowired
-    private UserService userService;
 
     @Test
     public void shouldDenyAnonymous() throws Exception {
@@ -56,8 +50,9 @@ public class AdminDeleteUserIntegrationTest {
 
     @Test
     public void whenAdminVisitDeleteUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("admin@ptxyz1.com");
-        beanFactory.autowireBean(user);
 
         var dom = Jsoup.parse(client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -88,8 +83,9 @@ public class AdminDeleteUserIntegrationTest {
 
     @Test
     public void whenOtherAdminVisitDeleteUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("admin@ptxyz2.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -107,8 +103,9 @@ public class AdminDeleteUserIntegrationTest {
 
     @Test
     public void whenManagerVisitDeleteUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("manager1@ptxyz.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -126,8 +123,9 @@ public class AdminDeleteUserIntegrationTest {
 
     @Test
     public void whenSupervisorVisitDeleteUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("supervisor1@ptxyz1.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -145,8 +143,9 @@ public class AdminDeleteUserIntegrationTest {
 
     @Test
     public void whenUserVisitDeleteUser() throws Exception {
+        var userService = new UserService(appContext);
+
         User user = userService.findByName("user1@ptxyz1.com");
-        beanFactory.autowireBean(user);
 
         client.perform(
                 MockMvcRequestBuilders.get(this.user1Url)
@@ -164,6 +163,10 @@ public class AdminDeleteUserIntegrationTest {
 
     @BeforeEach
     private void setup() {
+        var companyService = new CompanyService(appContext);
+        var userService = new UserService(appContext);
+        var roleService = new AuthRoleService(appContext);
+
         String user1Name = BASENAME + "User1";
         Company company = companyService.findByName("PT. XYZ-1");
 
@@ -176,7 +179,6 @@ public class AdminDeleteUserIntegrationTest {
             setPassword("pass");
         }});
         var user1 = userService.findByEmail(this.user1Email);
-        beanFactory.autowireBean(user1);
 
         AuthRole roleUser = roleService.findByName("user", null);
         user1.setRoles(roleUser);

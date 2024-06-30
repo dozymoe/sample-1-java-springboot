@@ -2,7 +2,7 @@ package moe.dozy.demo.sample1.requests;
 
 import java.io.Serializable;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.apache.ibatis.session.SqlSession;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
@@ -15,16 +15,13 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import moe.dozy.demo.sample1.models.User;
-import moe.dozy.demo.sample1.services.AuthRoleService;
+import moe.dozy.demo.sample1.repositories.AuthRoleRepository;
 
 @RequiredArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class UserRequest implements Serializable {
-
-    @Autowired
-    private AuthRoleService authRoleService;
 
     @Min(1)
     @NotNull @NonNull
@@ -53,7 +50,8 @@ public class UserRequest implements Serializable {
         target.setEmail(email);
     }
 
-    public void mergeRelationsTo(User target) {
-        target.setRoles(authRoleService.findById(role_id));
+    public void mergeRelationsTo(User target, SqlSession sqlSession) {
+        var roleService = sqlSession.getMapper(AuthRoleRepository.class);
+        target.setRoles(roleService.findById(role_id));
     }
 }

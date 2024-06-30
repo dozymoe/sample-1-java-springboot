@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.apache.ibatis.session.SqlSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -22,9 +24,7 @@ import moe.dozy.demo.sample1.services.CompanyService;
 public class User implements Serializable {
 
     @Autowired
-    private AuthorizationService authorizationService;
-    @Autowired
-    private CompanyService companyService;
+    private ApplicationContext appContext;
 
     @EqualsAndHashCode.Include
     @ToString.Include
@@ -42,6 +42,8 @@ public class User implements Serializable {
     private Optional<List<AuthRole>> _roles = Optional.empty();
     private Optional<List<AuthPermission>> _permissions = Optional.empty();
     private Optional<Company> _company = Optional.empty();
+
+    private SqlSession sqlSession;
 
     public String getFullName() { return fullname; }
     public void setFullName(String name) { this.fullname = name; }
@@ -63,6 +65,7 @@ public class User implements Serializable {
             return null;
         }
         if (_company.isEmpty() || ignoreCache) {
+            var companyService = getCompanyService();
             this._company = Optional.of(companyService.findById(company_id));
         }
         return _company.get();
@@ -92,8 +95,9 @@ public class User implements Serializable {
 
     public List<AuthRole> getRoles(String guard_name, Boolean ignoreCache) {
         if (_roles.isEmpty() || ignoreCache) {
-            this._roles = Optional.of(
-                    authorizationService.findAllUserRoles(this, guard_name));
+            var authService = getAuthorizationService();
+            this._roles = Optional.of(authService.findAllUserRoles(this,
+                    guard_name));
         }
         return _roles.get();
     }
@@ -111,11 +115,8 @@ public class User implements Serializable {
     }
 
     public List<String> getRoleNames(String guard_name, Boolean ignoreCache) {
-        if (_roles.isEmpty() || ignoreCache) {
-            this._roles = Optional.of(
-                    authorizationService.findAllUserRoles(this, guard_name));
-        }
-        return _roles.get().stream().map(AuthRole::getName)
+        var roles = getRoles(guard_name, ignoreCache);
+        return roles.stream().map(AuthRole::getName)
                 .collect(Collectors.toList());
     }
 
@@ -124,7 +125,8 @@ public class User implements Serializable {
     }
 
     public void setRoles(String guard_name, AuthRole ...roles) {
-        authorizationService.setUserRoles(this, guard_name, roles);
+        var authService = getAuthorizationService();
+        authService.setUserRoles(this, guard_name, roles);
         // clear cache
         this._roles = Optional.empty();
         this._permissions = Optional.empty();
@@ -144,8 +146,9 @@ public class User implements Serializable {
 
     public List<AuthPermission> getPermissions(String guard_name, Boolean ignoreCache) {
         if (_permissions.isEmpty() || ignoreCache) {
-            this._permissions = Optional.of(
-                    authorizationService.findAllUserPermissions(this, guard_name));
+            var authService = getAuthorizationService();
+            this._permissions = Optional.of(authService.findAllUserPermissions(
+                    this, guard_name));
         }
         return _permissions.get();
     }
@@ -164,7 +167,7 @@ public class User implements Serializable {
 
     public Boolean hasRole(String role, String guard_name,
             Boolean ignoreCache) {
-        List<AuthRole> roles = getRoles(guard_name, ignoreCache);
+        var roles = getRoles(guard_name, ignoreCache);
         return roles.stream().filter(o -> o.getName().equals(role))
                 .findFirst().isPresent();
     }
@@ -183,8 +186,8 @@ public class User implements Serializable {
 
     public Boolean hasPermission(String permission, String guard_name,
             Boolean ignoreCache) {
-        List<AuthPermission> roles = getPermissions(guard_name, ignoreCache);
-        return roles.stream().filter(o -> o.getName().equals(permission))
+        var perms = getPermissions(guard_name, ignoreCache);
+        return perms.stream().filter(o -> o.getName().equals(permission))
                 .findFirst().isPresent();
     }
 
@@ -202,8 +205,22 @@ public class User implements Serializable {
 
     public Boolean hasAnyPermission(List<String> permissions, String guard_name,
             Boolean ignoreCache) {
-        List<AuthPermission> roles = getPermissions(guard_name, ignoreCache);
-        return roles.stream().filter(o -> permissions.contains(o.getName()))
+        var perms = getPermissions(guard_name, ignoreCache);
+        return perms.stream().filter(o -> permissions.contains(o.getName()))
                 .findFirst().isPresent();
+    }
+
+    private CompanyService getCompanyService() {
+        if (sqlSession != null) {
+            return new CompanyService(sqlSession, appContext);
+        }
+        return new CompanyService(appContext);
+    }
+
+    private AuthorizationService getAuthorizationService() {
+        if (sqlSession != null) {
+            return new AuthorizationService(sqlSession, appContext);
+        }
+        return new AuthorizationService(appContext);
     }
 }

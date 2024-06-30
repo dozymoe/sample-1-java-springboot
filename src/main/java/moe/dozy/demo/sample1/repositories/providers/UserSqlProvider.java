@@ -1,4 +1,4 @@
-package moe.dozy.demo.sample1.services.providers;
+package moe.dozy.demo.sample1.repositories.providers;
 
 import java.util.Arrays;
 
